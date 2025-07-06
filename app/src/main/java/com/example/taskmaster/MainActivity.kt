@@ -21,6 +21,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.taskmaster.ui.theme.TaskMasterTheme
+import com.example.taskmaster.TaskStorage
 
 class MainActivity : ComponentActivity() {
     data class Task(val text: String, var isDone: Boolean = false)
@@ -34,10 +35,11 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContentView(R.layout.activity_main)
         listViewItems = findViewById(R.id.taskListView)
-        items = ArrayList()
+        items = TaskStorage.loadTasks(this) // Feladatok betöltése
         itemsAdapter = TaskAdapter(this, items) { position ->
             items.removeAt(position)
             itemsAdapter.notifyDataSetChanged()
+            TaskStorage.saveTasks(this, items) // Feladatok mentése
         }
         listViewItems.adapter = itemsAdapter
 
@@ -50,6 +52,7 @@ class MainActivity : ComponentActivity() {
             if (itemText.isNotEmpty()) {
                 items.add(Task(itemText))
                 itemsAdapter.notifyDataSetChanged()
+                TaskStorage.saveTasks(this, items) // Feladatok mentése
                 newItem.text.clear() // Beviteli mező törlése hozzáadás után
             }
         }
@@ -85,6 +88,7 @@ class MainActivity : ComponentActivity() {
             doneButton.setOnClickListener {
                 task.isDone = !task.isDone
                 notifyDataSetChanged()
+                TaskStorage.saveTasks(context, tasks) // Feladatok mentése
             }
 
             delButton.setOnClickListener {

@@ -3,4 +3,6 @@
     <string name="welcome_message">Üdvözöljük a TaskMaster alkalmazásban!</string>
     <string name="add_task">Feladat hozzáadása</string>
     <string name="task_hint">Írja be a feladatot...</string>
+    <string name="doneButton">✅</string>
+    <string name="delButton">❌</string>
 </resources>

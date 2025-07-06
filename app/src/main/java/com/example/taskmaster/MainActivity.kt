@@ -1,10 +1,15 @@
 package com.example.taskmaster
 
+import android.content.Context
 import android.os.Bundle
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.Button
 import android.widget.EditText
 import android.widget.ListView
+import android.widget.TextView
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -28,7 +33,10 @@ class MainActivity : ComponentActivity() {
         setContentView(R.layout.activity_main)
         listViewItems = findViewById(R.id.taskListView)
         items = ArrayList()
-        itemsAdapter = ArrayAdapter(this, android.R.layout.simple_list_item_1, items)
+        itemsAdapter = TaskAdapter(this, items) { position ->
+            items.removeAt(position)
+            itemsAdapter.notifyDataSetChanged()
+        }
         listViewItems.adapter = itemsAdapter
 
         setUpListView()
@@ -50,6 +58,21 @@ class MainActivity : ComponentActivity() {
             items.removeAt(position)
             itemsAdapter.notifyDataSetChanged()
             true
+        }
+    }
+
+    class TaskAdapter(context: Context, private val  tasks: MutableList<String>, private val onDelete: (Int) -> Unit) : ArrayAdapter<String>(context, 0, tasks) {
+        override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
+            val view = convertView ?: LayoutInflater.from(context).inflate(R.layout.list_item, parent, false)
+            val textView = view.findViewById<TextView>(R.id.itemTextView)
+            val delButton = view.findViewById<Button>(R.id.delButton)
+
+            textView.text = tasks[position]
+            delButton.setOnClickListener {
+                onDelete(position)
+            }
+
+            return view
         }
     }
 }

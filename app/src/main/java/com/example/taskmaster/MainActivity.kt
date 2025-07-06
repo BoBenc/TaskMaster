@@ -23,8 +23,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.example.taskmaster.ui.theme.TaskMasterTheme
 
 class MainActivity : ComponentActivity() {
-    private lateinit var items: ArrayList<String>
-    private lateinit var itemsAdapter: ArrayAdapter<String>
+    data class Task(val text: String, var isDone: Boolean = false)
+
+    private lateinit var items: MutableList<Task>
+    private lateinit var itemsAdapter: ArrayAdapter<Task>
     private lateinit var listViewItems: ListView
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -46,7 +48,7 @@ class MainActivity : ComponentActivity() {
             val newItem: EditText = findViewById(R.id.taskEditText)
             val itemText = newItem.text.toString()
             if (itemText.isNotEmpty()) {
-                items.add(itemText)
+                items.add(Task(itemText))
                 itemsAdapter.notifyDataSetChanged()
                 newItem.text.clear() // Beviteli mező törlése hozzáadás után
             }
@@ -61,13 +63,30 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    class TaskAdapter(context: Context, private val  tasks: MutableList<String>, private val onDelete: (Int) -> Unit) : ArrayAdapter<String>(context, 0, tasks) {
+    class TaskAdapter(context: Context, private val tasks: MutableList<Task>, private val onDelete: (Int) -> Unit) : ArrayAdapter<Task>(context, 0, tasks) {
         override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
             val view = convertView ?: LayoutInflater.from(context).inflate(R.layout.list_item, parent, false)
             val textView = view.findViewById<TextView>(R.id.itemTextView)
+            val doneButton = view.findViewById<Button>(R.id.doneButton)
             val delButton = view.findViewById<Button>(R.id.delButton)
 
-            textView.text = tasks[position]
+            val task = tasks[position]
+            textView.text = task.text
+
+            if (task.isDone) {
+                textView.paintFlags = textView.paintFlags or android.graphics.Paint.STRIKE_THRU_TEXT_FLAG
+                doneButton.text = context.getString(R.string.undo)
+            }
+            else {
+                textView.paintFlags = textView.paintFlags and android.graphics.Paint.STRIKE_THRU_TEXT_FLAG.inv()
+                doneButton.text = context.getString(R.string.doneButton)
+            }
+
+            doneButton.setOnClickListener {
+                task.isDone = !task.isDone
+                notifyDataSetChanged()
+            }
+
             delButton.setOnClickListener {
                 onDelete(position)
             }

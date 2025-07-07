@@ -1,7 +1,12 @@
 package com.example.taskmaster
 
+import android.app.AlertDialog
 import android.content.Context
+import android.graphics.Typeface
 import android.os.Bundle
+import android.text.SpannableString
+import android.text.Spanned
+import android.text.style.StyleSpan
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -92,7 +97,23 @@ class MainActivity : ComponentActivity() {
             }
 
             delButton.setOnClickListener {
-                onDelete(position)
+                val normalText = "Biztosan törölni szeretnéd ezt a feladatot? \n \n"
+                val boldText = task.text
+
+                val spannable = SpannableString(normalText + boldText)
+                spannable.setSpan(
+                    StyleSpan(Typeface.BOLD),
+                    normalText.length,
+                    normalText.length + boldText.length,
+                    Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+                )
+
+                AlertDialog.Builder(context)
+                    .setTitle("Feladat törlése")
+                    .setMessage(spannable)
+                    .setPositiveButton("Igen") { dialog, _ -> onDelete(position) }
+                    .setNegativeButton("Mégsem") { dialog, _ -> dialog.dismiss() }
+                    .show()
             }
 
             return view

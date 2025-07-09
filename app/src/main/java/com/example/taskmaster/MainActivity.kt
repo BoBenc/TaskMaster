@@ -2,14 +2,17 @@ package com.example.taskmaster
 
 import android.app.AlertDialog
 import android.content.Context
+import android.graphics.Rect
 import android.graphics.Typeface
 import android.os.Bundle
 import android.text.SpannableString
 import android.text.Spanned
 import android.text.style.StyleSpan
 import android.view.LayoutInflater
+import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.InputMethodManager
 import android.widget.ArrayAdapter
 import android.widget.Button
 import android.widget.EditText
@@ -25,6 +28,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.core.content.getSystemService
 import com.example.taskmaster.ui.theme.TaskMasterTheme
 import com.example.taskmaster.TaskStorage
 import com.google.android.material.textfield.TextInputEditText
@@ -55,13 +59,31 @@ class MainActivity : ComponentActivity() {
         btnAddButton.setOnClickListener {
             val newItem: TextInputEditText = findViewById(R.id.taskEditText)
             val itemText = newItem.text.toString()
+            val imm = getSystemService<InputMethodManager>()
             if (itemText.isNotEmpty()) {
                 items.add(Task(itemText))
                 itemsAdapter.notifyDataSetChanged()
                 TaskStorage.saveTasks(this, items) // Feladatok mentése
                 newItem.text?.clear() // Beviteli mező törlése hozzáadás után
+                newItem.clearFocus()
+                imm?.hideSoftInputFromWindow(newItem.windowToken, 0)
             }
         }
+    }
+
+    override fun dispatchTouchEvent(ev: MotionEvent): Boolean {
+        if(ev.action == MotionEvent.ACTION_DOWN) {
+            currentFocus?.let { v ->
+                if (v is EditText) {
+                    val r = Rect().apply { v.getGlobalVisibleRect(this) }
+                    if (!r.contains(ev.rawX.toInt(), ev.rawY.toInt())) {
+                        v.clearFocus()
+                        getSystemService<InputMethodManager>()?.hideSoftInputFromWindow(v.windowToken, 0)
+                    }
+                }
+            }
+        }
+        return super.dispatchTouchEvent(ev)
     }
 
     private fun setUpListView() {
@@ -85,10 +107,12 @@ class MainActivity : ComponentActivity() {
             if (task.isDone) {
                 textView.paintFlags = textView.paintFlags or android.graphics.Paint.STRIKE_THRU_TEXT_FLAG
                 doneButton.text = context.getString(R.string.undo)
+                doneButton.setBackgroundResource(R.drawable.custom_refresh_button)
             }
             else {
                 textView.paintFlags = textView.paintFlags and android.graphics.Paint.STRIKE_THRU_TEXT_FLAG.inv()
                 doneButton.text = context.getString(R.string.doneButton)
+                doneButton.setBackgroundResource(R.drawable.custom_done_button)
             }
 
             doneButton.setOnClickListener {

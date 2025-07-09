@@ -27,6 +27,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.taskmaster.ui.theme.TaskMasterTheme
 import com.example.taskmaster.TaskStorage
+import com.google.android.material.textfield.TextInputEditText
 
 class MainActivity : ComponentActivity() {
     data class Task(val text: String, var isDone: Boolean = false)
@@ -52,13 +53,13 @@ class MainActivity : ComponentActivity() {
 
         val btnAddButton: Button = findViewById(R.id.addButton)
         btnAddButton.setOnClickListener {
-            val newItem: EditText = findViewById(R.id.taskEditText)
+            val newItem: TextInputEditText = findViewById(R.id.taskEditText)
             val itemText = newItem.text.toString()
             if (itemText.isNotEmpty()) {
                 items.add(Task(itemText))
                 itemsAdapter.notifyDataSetChanged()
                 TaskStorage.saveTasks(this, items) // Feladatok mentése
-                newItem.text.clear() // Beviteli mező törlése hozzáadás után
+                newItem.text?.clear() // Beviteli mező törlése hozzáadás után
             }
         }
     }

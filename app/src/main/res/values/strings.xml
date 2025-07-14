@@ -7,4 +7,8 @@
     <string name="undo">🔁</string>
     <string name="delButton">❌</string>
     <string name="authorText">Készítette: BoBenc</string>
+    <string name="alertTextTitle">Feladat törlése</string>
+    <string name="alertText">Biztosan törölni szeretnéd ezt a feladatot?</string>
+    <string name="alertDeleteButton">Törlés</string>
+    <string name="alertCancelButton">Mégsem</string>
 </resources>

@@ -121,10 +121,30 @@ class MainActivity : ComponentActivity() {
                 TaskStorage.saveTasks(context, tasks) // Feladatok mentése
             }
 
+//            delButton.setOnClickListener {
+//                val normalText = "Biztosan törölni szeretnéd ezt a feladatot? \n \n"
+//                val boldText = task.text
+//
+//                val spannable = SpannableString(normalText + boldText)
+//                spannable.setSpan(
+//                    StyleSpan(Typeface.BOLD),
+//                    normalText.length,
+//                    normalText.length + boldText.length,
+//                    Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+//                )
+//
+//                AlertDialog.Builder(context)
+//                    .setTitle("Feladat törlése")
+//                    .setMessage(spannable)
+//                    .setPositiveButton("Igen") { dialog, _ -> onDelete(position) }
+//                    .setNegativeButton("Mégsem") { dialog, _ -> dialog.dismiss() }
+//                    .show()
+//            }
+
             delButton.setOnClickListener {
+                val dialogView = LayoutInflater.from(context).inflate(R.layout.custom_alert, null)
                 val normalText = "Biztosan törölni szeretnéd ezt a feladatot? \n \n"
                 val boldText = task.text
-
                 val spannable = SpannableString(normalText + boldText)
                 spannable.setSpan(
                     StyleSpan(Typeface.BOLD),
@@ -132,13 +152,23 @@ class MainActivity : ComponentActivity() {
                     normalText.length + boldText.length,
                     Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
                 )
+                val alertTextView = dialogView.findViewById<TextView>(R.id.alertText)
+                alertTextView.text = spannable
 
-                AlertDialog.Builder(context)
-                    .setTitle("Feladat törlése")
-                    .setMessage(spannable)
-                    .setPositiveButton("Igen") { dialog, _ -> onDelete(position) }
-                    .setNegativeButton("Mégsem") { dialog, _ -> dialog.dismiss() }
-                    .show()
+                val alertDialog = AlertDialog.Builder(context)
+                    .setView(dialogView)
+                    .create()
+
+                dialogView.findViewById<Button>(R.id.alertDeleteButton).setOnClickListener {
+                    onDelete(position)
+                    alertDialog.dismiss()
+                }
+
+                dialogView.findViewById<Button>(R.id.alertCancelButton).setOnClickListener {
+                    alertDialog.dismiss()
+                }
+
+                alertDialog.show()
             }
 
             return view

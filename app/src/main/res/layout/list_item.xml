@@ -10,6 +10,16 @@
     android:paddingStart="12dp"
     android:paddingEnd="12dp">
 
+    <Button
+        android:layout_width="36dp"
+        android:layout_height="36dp"
+        android:id="@+id/itemSpeaker"
+        android:text="@string/speaker"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_marginEnd="8dp"/>
+
     <TextView
         android:id="@+id/itemTextView"
         android:layout_width="0dp"
@@ -17,7 +27,7 @@
         android:textSize="18sp"
         android:maxLines="1"
         android:ellipsize="end"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/itemSpeaker"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/doneButton"
         app:layout_constraintTop_toTopOf="parent"/>

@@ -11,4 +11,5 @@
     <string name="alertText">Biztosan törölni szeretnéd ezt a feladatot?</string>
     <string name="alertDeleteButton">Törlés</string>
     <string name="alertCancelButton">Mégsem</string>
+    <string name="speaker">🔊</string>
 </resources>

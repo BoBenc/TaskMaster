@@ -39,9 +39,11 @@ class MainActivity : ComponentActivity() {
     private lateinit var items: MutableList<Task>
     private lateinit var itemsAdapter: ArrayAdapter<Task>
     private lateinit var listViewItems: ListView
+    private lateinit var taskSpeaker: TaskSpeaker
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        taskSpeaker = TaskSpeaker(this) // TaskSpeaker inicializálása
         enableEdgeToEdge()
         setContentView(R.layout.activity_main)
         listViewItems = findViewById(R.id.taskListView)
@@ -86,6 +88,11 @@ class MainActivity : ComponentActivity() {
         return super.dispatchTouchEvent(ev)
     }
 
+    override fun onDestroy() {
+        taskSpeaker.shutdown()
+        super.onDestroy()
+    }
+
     private fun setUpListView() {
         listViewItems.setOnItemClickListener { _, _, position, _ ->
             items.removeAt(position)
@@ -100,6 +107,7 @@ class MainActivity : ComponentActivity() {
             val textView = view.findViewById<TextView>(R.id.itemTextView)
             val doneButton = view.findViewById<Button>(R.id.doneButton)
             val delButton = view.findViewById<Button>(R.id.delButton)
+            val speakerButton = view.findViewById<Button>(R.id.itemSpeaker)
 
             val task = tasks[position]
             textView.text = task.text
@@ -169,6 +177,10 @@ class MainActivity : ComponentActivity() {
                 }
 
                 alertDialog.show()
+            }
+
+            speakerButton.setOnClickListener {
+                (context as? MainActivity)?.taskSpeaker?.speak(task.text)
             }
 
             return view

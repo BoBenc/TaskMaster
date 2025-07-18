@@ -6,7 +6,8 @@
     android:id="@+id/activityMain"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:focusableInTouchMode="true">
+    android:focusableInTouchMode="true"
+    android:fitsSystemWindows="true">
 
     <TextView
         android:id="@+id/welcomeTextView"

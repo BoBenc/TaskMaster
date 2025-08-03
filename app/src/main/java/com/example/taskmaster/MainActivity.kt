@@ -34,8 +34,6 @@ import com.example.taskmaster.TaskStorage
 import com.google.android.material.textfield.TextInputEditText
 
 class MainActivity : ComponentActivity() {
-    data class Task(val text: String, var isDone: Boolean = false)
-
     private lateinit var items: MutableList<Task>
     private lateinit var itemsAdapter: ArrayAdapter<Task>
     private lateinit var listViewItems: ListView
@@ -63,9 +61,10 @@ class MainActivity : ComponentActivity() {
             val itemText = newItem.text.toString()
             val imm = getSystemService<InputMethodManager>()
             if (itemText.isNotEmpty()) {
-                items.add(Task(itemText))
+                items.add(Task(text = itemText))
                 itemsAdapter.notifyDataSetChanged()
                 TaskStorage.saveTasks(this, items) // Feladatok mentése
+                TaskSync.sendAllTaskToWatch(this, items)
                 newItem.text?.clear() // Beviteli mező törlése hozzáadás után
                 newItem.clearFocus()
                 imm?.hideSoftInputFromWindow(newItem.windowToken, 0)
@@ -127,6 +126,7 @@ class MainActivity : ComponentActivity() {
                 task.isDone = !task.isDone
                 notifyDataSetChanged()
                 TaskStorage.saveTasks(context, tasks) // Feladatok mentése
+                TaskSync.sendAllTaskToWatch(context, tasks)
             }
 
 //            delButton.setOnClickListener {
@@ -169,6 +169,7 @@ class MainActivity : ComponentActivity() {
 
                 dialogView.findViewById<Button>(R.id.alertDeleteButton).setOnClickListener {
                     onDelete(position)
+                    TaskSync.sendAllTaskToWatch(context, tasks)
                     alertDialog.dismiss()
                 }
 

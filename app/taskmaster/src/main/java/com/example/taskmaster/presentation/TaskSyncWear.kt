@@ -1,10 +1,8 @@
 package com.example.taskmaster.presentation
 
+import android.content.Context
 import android.util.Log
-import com.google.android.gms.wearable.DataEvent
-import com.google.android.gms.wearable.DataEventBuffer
-import com.google.android.gms.wearable.DataMapItem
-import com.google.android.gms.wearable.WearableListenerService
+import com.google.android.gms.wearable.*
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 
@@ -25,6 +23,21 @@ class TaskSyncWear : WearableListenerService() {
                     }
                 }
             }
+        }
+    }
+    companion object {
+        fun sendTasksToPhone(context: Context, tasks: List<Task>) {
+            Log.d("WEAR_SYNC", "Adatküldés telefonra")
+            val gson = Gson()
+            val json = gson.toJson(tasks)
+            val dataMapRequest = PutDataMapRequest.create("/tasks").apply {
+                dataMap.putString("tasks_json", json)
+                dataMap.putLong("timestamp", System.currentTimeMillis())
+            }
+            val request = dataMapRequest.asPutDataRequest()
+            Wearable.getDataClient(context).putDataItem(request)
+                .addOnSuccessListener { Log.d("WEAR_SYNC", "Sikeres küldés telefonra") }
+                .addOnFailureListener { e -> Log.e("WEAR_SYNC", "Küldés sikertelen: ${e.message}") }
         }
     }
 }

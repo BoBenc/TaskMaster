@@ -126,6 +126,7 @@ fun OnShowMainScreen() {
             if (task.id == taskId) task.copy(isDone = !task.isDone) else task
         }
         TaskStorageWear.saveTasks(context, tasks)
+        TaskSyncWear.sendTasksToPhone(context, tasks)
     }
 
     Box(

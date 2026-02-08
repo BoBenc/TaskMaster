@@ -32,6 +32,11 @@ import androidx.core.content.getSystemService
 import com.example.taskmaster.ui.theme.TaskMasterTheme
 import com.example.taskmaster.TaskStorage
 import com.google.android.material.textfield.TextInputEditText
+import android.content.BroadcastReceiver
+import android.content.Intent
+import android.content.IntentFilter
+import android.os.Build
+import android.util.Log
 
 class MainActivity : ComponentActivity() {
     private lateinit var items: MutableList<Task>
@@ -54,6 +59,7 @@ class MainActivity : ComponentActivity() {
         listViewItems.adapter = itemsAdapter
 
         setUpListView()
+        refreshTaskList()
 
         val btnAddButton: Button = findViewById(R.id.addButton)
         btnAddButton.setOnClickListener {
@@ -70,6 +76,25 @@ class MainActivity : ComponentActivity() {
                 imm?.hideSoftInputFromWindow(newItem.windowToken, 0)
             }
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        // Mindig frissítsünk, amikor az app előtérbe kerül
+        refreshTaskList()
+
+        val filter = IntentFilter("com.example.taskmaster.UPDATE_TASKS")
+
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
+            registerReceiver(updateReceiver, filter, Context.RECEIVER_NOT_EXPORTED)
+        } else {
+            registerReceiver(updateReceiver, filter)
+        }
+    }
+
+    override fun onPause() {
+        super.onPause()
+        unregisterReceiver(updateReceiver)
     }
 
     override fun dispatchTouchEvent(ev: MotionEvent): Boolean {
@@ -97,6 +122,21 @@ class MainActivity : ComponentActivity() {
             items.removeAt(position)
             itemsAdapter.notifyDataSetChanged()
             true
+        }
+    }
+
+    private fun refreshTaskList() {
+        items.clear()
+        items.addAll(TaskStorage.loadTasks(this))
+        itemsAdapter.notifyDataSetChanged()
+    }
+
+    private val updateReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context, intent: Intent) {
+            if (intent.action == "com.example.taskmaster.UPDATE_TASKS") {
+                Log.d("MAIN_ACTIVITY", "Frissítési kérés érkezett")
+                refreshTaskList()
+            }
         }
     }
 

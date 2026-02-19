@@ -1,6 +1,7 @@
 package com.example.taskmaster.presentation
 
 import android.content.Context
+import android.content.Intent
 import android.util.Log
 import com.google.android.gms.wearable.*
 import com.google.gson.Gson
@@ -19,6 +20,9 @@ class TaskSyncWear : WearableListenerService() {
                     if (json != null) {
                         val tasks: List<Task> = Gson().fromJson(json, object : TypeToken<List<Task>>() {}.type)
                         TaskStorageWear.saveTasks(this, tasks)
+                        val intent = Intent("com.example.taskmaster.UPDATE_WEAR_TASKS")
+                        intent.setPackage(packageName)
+                        sendBroadcast(intent)
                         Log.d("WEAR_SYNC", "Adat fogadva")
                     }
                 }
